@@ -27,6 +27,21 @@ export const createTeam = async (req, res) => {
   }
 };
 
+export const getAllTeams = async (req, res) => {
+  try {
+    const teams = await Team.find()
+      .populate("members", "name email role")
+      .sort({ name: 1 });
+
+    return res.status(200).json(teams);
+  } catch (err) {
+    return res.status(500).json({
+      message: "Failed to fetch teams",
+      error: err.message,
+    });
+  }
+};
+
 export const addMemberToTeam = async (req, res) => {
   try {
     const { teamId, userId } = req.body;
