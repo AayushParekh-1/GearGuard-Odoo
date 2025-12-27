@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { getDepartments } from '@/lib/getData'
+import { departmentAPI } from '@/lib/api'
 import {
   Table,
   TableBody,
@@ -9,14 +10,65 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
-import { Building2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Building2, Plus } from 'lucide-react'
 import Navbar from '@/components/Navbar'
+import { isAdminOrManager } from '@/lib/authUtils'
 
 const Department = () => {
-  const departments = getDepartments()
+  const [departments, setDepartments] = useState([])
+  const canEdit = isAdminOrManager()
   
-  // State for search
+  // State for search and dialog
   const [searchQuery, setSearchQuery] = useState('')
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [formData, setFormData] = useState({ name: '', description: '' })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  // Fetch departments
+  useEffect(() => {
+    fetchDepartments()
+  }, [])
+
+  const fetchDepartments = async () => {
+    try {
+      const data = await departmentAPI.getAll()
+      setDepartments(data)
+    } catch (error) {
+      console.error('Error fetching departments:', error)
+      // Fallback to mock data if API fails
+      setDepartments(getDepartments())
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    try {
+      await departmentAPI.create(formData)
+      // Reset form and close dialog
+      setFormData({ name: '', description: '' })
+      setIsDialogOpen(false)
+      // Refresh departments list
+      await fetchDepartments()
+    } catch (error) {
+      console.error('Error creating department:', error)
+      setError(error.message || 'Failed to create department')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Filter departments by name or description
   const filteredDepartments = useMemo(() => {
@@ -63,11 +115,79 @@ const Department = () => {
 
         {/* Departments Table */}
         <div className="bg-white rounded-lg shadow-sm border border-purple-100 overflow-hidden">
-          <div className="p-6 border-b border-purple-100">
+          <div className="p-6 border-b border-purple-100 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <Building2 className="h-5 w-5 text-purple-600" />
               Departments List ({filteredDepartments.length})
             </h2>
+            {canEdit && (
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-purple-600 hover:bg-purple-700">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add New
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Department</DialogTitle>
+                    <DialogDescription>
+                      Create a new department. Department name is required.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit}>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <label htmlFor="name" className="text-sm font-medium">
+                          Department Name <span className="text-red-500">*</span>
+                        </label>
+                        <Input
+                          id="name"
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          placeholder="e.g., IT, MECHANICAL"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="description" className="text-sm font-medium">
+                          Description
+                        </label>
+                        <Input
+                          id="description"
+                          value={formData.description}
+                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                          placeholder="Department description"
+                        />
+                      </div>
+                    </div>
+                    {error && (
+                      <div className="text-sm text-red-600 mt-2">{error}</div>
+                    )}
+                    <DialogFooter>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setIsDialogOpen(false)
+                          setError(null)
+                        }}
+                        disabled={loading}
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        type="submit" 
+                        className="bg-purple-600 hover:bg-purple-700"
+                        disabled={loading}
+                      >
+                        {loading ? 'Creating...' : 'Create Department'}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
           
           <div className="overflow-x-auto">

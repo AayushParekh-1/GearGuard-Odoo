@@ -7,6 +7,10 @@ import equipmentRoutes from "./routes/equipmentRoute.js"
 import authRoutes from "./routes/authRoute.js";
 import adminRoutes from "./routes/adminRoute.js"
 import maintainanceRequestRoute from "./routes/maintainanceRequestRoute.js";
+import departmentRoutes from "./routes/departmentRoute.js";
+import teamRoutes from "./routes/teamRoute.js";
+import workcenterRoutes from "./routes/workcenterRoute.js";
+import equipmentCategoryRoutes from "./routes/equipmentCategoryRoute.js";
 dotenv.config();
 
 const app = express();
@@ -27,6 +31,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use('/api/equipment', equipmentRoutes);
 app.use("/api/requests", maintainanceRequestRoute);
+app.use("/api/departments", departmentRoutes);
+app.use("/api/teams", teamRoutes);
+app.use("/api/workcenters", workcenterRoutes);
+app.use("/api/equipment-categories", equipmentCategoryRoutes);
 
 
 const PORT = process.env.PORT || 5002;

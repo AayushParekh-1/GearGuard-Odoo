@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { getTeams, getTeamMembers } from '@/lib/getData'
+import { teamAPI } from '@/lib/api'
 import {
   Table,
   TableBody,
@@ -9,13 +10,45 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { ChevronDown, ChevronUp, Users } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { ChevronDown, ChevronUp, Users, Plus } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import { cn } from '@/lib/utils'
+import { isAdminOrManager } from '@/lib/authUtils'
 
 const Teams = () => {
-  const teams = getTeams()
+  const [teams, setTeams] = useState([])
+  const canEdit = isAdminOrManager()
   const [expandedTeams, setExpandedTeams] = useState(new Set())
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [formData, setFormData] = useState({ teamName: '' })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  // Fetch teams
+  useEffect(() => {
+    fetchTeams()
+  }, [])
+
+  const fetchTeams = async () => {
+    try {
+      const data = await teamAPI.getAll()
+      setTeams(data)
+    } catch (error) {
+      console.error('Error fetching teams:', error)
+      // Fallback to mock data if API fails
+      setTeams(getTeams())
+    }
+  }
 
   const toggleTeam = (teamId) => {
     const newExpanded = new Set(expandedTeams)
@@ -25,6 +58,23 @@ const Teams = () => {
       newExpanded.add(teamId)
     }
     setExpandedTeams(newExpanded)
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    try {
+      await teamAPI.create({ teamName: formData.teamName })
+      setFormData({ teamName: '' })
+      setIsDialogOpen(false)
+      await fetchTeams()
+    } catch (error) {
+      console.error('Error creating team:', error)
+      setError(error.message || 'Failed to create team')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -39,11 +89,68 @@ const Teams = () => {
 
         {/* Teams Table */}
         <div className="bg-white rounded-lg shadow-sm border border-purple-100 overflow-hidden">
-          <div className="p-6 border-b border-purple-100">
+          <div className="p-6 border-b border-purple-100 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <Users className="h-5 w-5 text-purple-600" />
               Teams List ({teams.length})
             </h2>
+            {canEdit && (
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-purple-600 hover:bg-purple-700">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add New
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Team</DialogTitle>
+                    <DialogDescription>
+                      Create a new team. Team name is required.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit}>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <label htmlFor="teamName" className="text-sm font-medium">
+                          Team Name <span className="text-red-500">*</span>
+                        </label>
+                        <Input
+                          id="teamName"
+                          value={formData.teamName}
+                          onChange={(e) => setFormData({ teamName: e.target.value })}
+                          placeholder="e.g., Mechanical Internal Maintenance Team"
+                          required
+                        />
+                      </div>
+                    </div>
+                    {error && (
+                      <div className="text-sm text-red-600 mt-2">{error}</div>
+                    )}
+                    <DialogFooter>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setIsDialogOpen(false)
+                          setError(null)
+                        }}
+                        disabled={loading}
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        type="submit" 
+                        className="bg-purple-600 hover:bg-purple-700"
+                        disabled={loading}
+                      >
+                        {loading ? 'Creating...' : 'Create Team'}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
           
           <div className="overflow-x-auto">
@@ -66,7 +173,10 @@ const Teams = () => {
                 ) : (
                   teams.map((team) => {
                     const isExpanded = expandedTeams.has(team._id)
-                    const members = getTeamMembers(team._id)
+                    // Handle both API response (members array with user objects) and mock data (member IDs)
+                    const members = team.members 
+                      ? (team.members[0]?.name ? team.members.map(m => m.name) : getTeamMembers(team._id))
+                      : getTeamMembers(team._id)
                     
                     return (
                       <React.Fragment key={team._id}>

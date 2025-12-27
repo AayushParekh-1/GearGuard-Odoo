@@ -1,5 +1,18 @@
-import React, { useState, useMemo } from 'react'
-import { getEquipments, getEquipmentCategories } from '@/lib/getData'
+import React, { useState, useMemo, useEffect } from 'react'
+import {
+  equipmentAPI,
+  equipmentCategoryAPI,
+  teamAPI,
+  departmentAPI,
+  workCenterAPI,
+} from '@/lib/api'
+import {
+  getEquipments,
+  getEquipmentCategories,
+  getTeams,
+  getDepartments,
+  getWorkCenters,
+} from '@/lib/getData'
 import {
   Table,
   TableBody,
@@ -9,160 +22,270 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { FolderOpen } from 'lucide-react'
+import { FolderOpen, Plus } from 'lucide-react'
 import Navbar from '@/components/Navbar'
+import { isAdminOrManager } from '@/lib/authUtils'
 
 const Equipment = () => {
-  const equipments = getEquipments()
-  const equipmentCategories = getEquipmentCategories()
-  
-  // State for search
+  const canEdit = isAdminOrManager()
+
+  const [equipments, setEquipments] = useState([])
+  const [equipmentCategories, setEquipmentCategories] = useState([])
+  const [teams, setTeams] = useState([])
+  const [departments, setDepartments] = useState([])
+  const [workCenters, setWorkCenters] = useState([])
+
   const [searchQuery, setSearchQuery] = useState('')
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false)
+  const [isEquipmentDialogOpen, setIsEquipmentDialogOpen] = useState(false)
 
-  // Filter equipments by name or serial number
-  const filteredEquipments = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return equipments
+  const [categoryFormData, setCategoryFormData] = useState({
+    name: '',
+    companyName: 'My Company',
+    teamId: 'none',
+  })
+
+  const [equipmentFormData, setEquipmentFormData] = useState({
+    name: '',
+    serialNumber: '',
+    categoryId: '',
+    departmentId: '',
+    location: '',
+    workCenterId: '',
+    maintenanceTeamId: '',
+  })
+
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  /* ---------------- FETCH ---------------- */
+
+  useEffect(() => {
+    Promise.all([
+      equipmentAPI.getAll().catch(() => getEquipments()),
+      equipmentCategoryAPI.getAll().catch(() => getEquipmentCategories()),
+      teamAPI.getAll().catch(() => getTeams()),
+      departmentAPI.getAll().catch(() => getDepartments()),
+      workCenterAPI.getAll().catch(() => getWorkCenters()),
+    ]).then(
+      ([e, c, t, d, w]) => {
+        setEquipments(e)
+        setEquipmentCategories(c)
+        setTeams(t)
+        setDepartments(d)
+        setWorkCenters(w)
+      }
+    )
+  }, [])
+
+  /* ---------------- SUBMIT CATEGORY ---------------- */
+
+  const handleCategorySubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    try {
+      await equipmentCategoryAPI.create({
+        ...categoryFormData,
+        teamId:
+          categoryFormData.teamId === 'none'
+            ? null
+            : categoryFormData.teamId,
+      })
+
+      setCategoryFormData({
+        name: '',
+        companyName: 'My Company',
+        teamId: 'none',
+      })
+
+      setIsCategoryDialogOpen(false)
+      setEquipmentCategories(await equipmentCategoryAPI.getAll())
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    const query = searchQuery.toLowerCase().trim()
-    return equipments.filter(equipment => {
-      const nameMatch = equipment.name?.toLowerCase().includes(query)
-      const serialMatch = equipment.serialNumber?.toLowerCase().includes(query)
-      return nameMatch || serialMatch
-    })
+  /* ---------------- SUBMIT EQUIPMENT ---------------- */
+
+  const handleEquipmentSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    try {
+      await equipmentAPI.create(equipmentFormData)
+      setIsEquipmentDialogOpen(false)
+      setEquipments(await equipmentAPI.getAll())
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  /* ---------------- FILTER ---------------- */
+
+  const filteredEquipments = useMemo(() => {
+    if (!searchQuery.trim()) return equipments
+    return equipments.filter(
+      (e) =>
+        e.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        e.serialNumber?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
   }, [equipments, searchQuery])
+
+  /* ---------------- UI ---------------- */
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Equipment Management</h1>
-          <p className="text-gray-600">View and manage all equipment</p>
-        </div>
+        <h1 className="text-3xl font-bold mb-6">Equipment Management</h1>
 
-        {/* Equipment Categories Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-purple-100 overflow-hidden mb-6">
-          <div className="p-6 border-b border-purple-100">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <FolderOpen className="h-5 w-5 text-purple-600" />
-              Equipment Categories ({equipmentCategories.length})
+        {/* CATEGORY SECTION */}
+        <div className="bg-white p-6 rounded-lg mb-6 border">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="font-semibold flex items-center gap-2">
+              <FolderOpen className="text-purple-600" />
+              Categories
             </h2>
+
+            {canEdit && (
+              <Dialog
+                open={isCategoryDialogOpen}
+                onOpenChange={setIsCategoryDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Category
+                  </Button>
+                </DialogTrigger>
+
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Category</DialogTitle>
+                    <DialogDescription>
+                      Team is optional
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <form onSubmit={handleCategorySubmit} className="space-y-4">
+                    <Input
+                      placeholder="Category name"
+                      value={categoryFormData.name}
+                      onChange={(e) =>
+                        setCategoryFormData({
+                          ...categoryFormData,
+                          name: e.target.value,
+                        })
+                      }
+                      required
+                    />
+
+                    <Select
+                      value={categoryFormData.teamId}
+                      onValueChange={(v) =>
+                        setCategoryFormData({
+                          ...categoryFormData,
+                          teamId: v,
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select team (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {teams.map((t) => (
+                          <SelectItem key={t._id} value={t._id}>
+                            {t.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    {error && (
+                      <p className="text-sm text-red-600">{error}</p>
+                    )}
+
+                    <DialogFooter>
+                      <Button type="submit" disabled={loading}>
+                        {loading ? 'Saving...' : 'Save'}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
-          
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {equipmentCategories.map((category) => (
-                <div
-                  key={category._id}
-                  className="p-4 rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50 to-white hover:shadow-md transition-shadow"
-                >
-                  <h3 className="font-semibold text-gray-900 mb-2">{category.name}</h3>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Company:</span>
-                      <span className="font-medium text-gray-900">{category.companyName}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Team:</span>
-                      <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-300">
-                        {category.teamName}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            {equipmentCategories.map((c) => (
+              <div key={c._id} className="p-3 border rounded-lg">
+                <p className="font-medium">{c.name}</p>
+                <Badge>{c.teamName || 'No Team'}</Badge>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Search Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-purple-100 p-6 mb-6">
-          <div className="max-w-md">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Search Equipment
-            </label>
-            <Input
-              type="text"
-              placeholder="Search by equipment name or serial number..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full"
-            />
-            <p className="text-xs text-gray-500 mt-2">
-              {filteredEquipments.length} equipment{filteredEquipments.length !== 1 ? 's' : ''} found
-            </p>
-          </div>
-        </div>
+        {/* SEARCH */}
+        <Input
+          placeholder="Search equipment..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="mb-4 max-w-md"
+        />
 
-        {/* Equipment Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-purple-100 overflow-hidden">
-          <div className="p-6 border-b border-purple-100">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Equipment List ({filteredEquipments.length})
-            </h2>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-purple-50">
-                  <TableHead className="font-semibold text-gray-900">Equipment Name</TableHead>
-                  <TableHead className="font-semibold text-gray-900">Employee</TableHead>
-                  <TableHead className="font-semibold text-gray-900">Department</TableHead>
-                  <TableHead className="font-semibold text-gray-900">Serial Number</TableHead>
-                  <TableHead className="font-semibold text-gray-900">Technician</TableHead>
-                  <TableHead className="font-semibold text-gray-900">Equipment Category</TableHead>
-                  <TableHead className="font-semibold text-gray-900">Company</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredEquipments.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                      {searchQuery 
-                        ? `No equipment found matching "${searchQuery}"`
-                        : 'No equipment available.'}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredEquipments.map((equipment) => (
-                    <TableRow key={equipment._id} className="hover:bg-purple-50/50">
-                      <TableCell className="font-medium text-gray-900">
-                        {equipment.name || '-'}
-                      </TableCell>
-                      <TableCell className="text-gray-700">
-                        {equipment.employeeName || '-'}
-                      </TableCell>
-                      <TableCell className="text-gray-700">
-                        {equipment.departmentName || '-'}
-                      </TableCell>
-                      <TableCell className="text-gray-700 font-mono text-sm">
-                        {equipment.serialNumber || '-'}
-                      </TableCell>
-                      <TableCell className="text-gray-700">
-                        {equipment.technicianName || '-'}
-                      </TableCell>
-                      <TableCell className="text-gray-700">
-                        {equipment.categoryName || '-'}
-                      </TableCell>
-                      <TableCell className="text-gray-700">
-                        {equipment.companyName || '-'}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+        {/* EQUIPMENT TABLE */}
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Serial</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead>Category</TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {filteredEquipments.map((e) => (
+              <TableRow key={e._id}>
+                <TableCell>{e.name}</TableCell>
+                <TableCell>{e.serialNumber}</TableCell>
+                <TableCell>{e.departmentName}</TableCell>
+                <TableCell>{e.categoryName}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   )
 }
 
 export default Equipment
-
