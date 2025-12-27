@@ -26,29 +26,29 @@ const maintenanceRequestSchema = new mongoose.Schema(
       default: null,
     },
 
-    equipmentName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    // equipmentName: {
+    //   type: String,
+    //   trim: true,
+    //   default: "",
+    // },
 
-    equipmentSerialNo: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    // equipmentSerialNo: {
+    //   type: String,
+    //   trim: true,
+    //   default: "",
+    // },
 
-    categoryName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    // categoryName: {
+    //   type: String,
+    //   trim: true,
+    //   default: "",
+    // },
 
-    responsibleEmployeeName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    // responsibleEmployeeName: {
+    //   type: String,
+    //   trim: true,
+    //   default: "",
+    // },
 
     workCenterId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -56,11 +56,11 @@ const maintenanceRequestSchema = new mongoose.Schema(
       default: null,
     },
 
-    workCenterName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    // workCenterName: {
+    //   type: String,
+    //   trim: true,
+    //   default: "",
+    // },
 
     requestDate: {
       type: Date,
@@ -79,11 +79,11 @@ const maintenanceRequestSchema = new mongoose.Schema(
       required: true,
     },
 
-    maintenanceTeamName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    // maintenanceTeamName: {
+    //   type: String,
+    //   trim: true,
+    //   default: "",
+    // },
 
     technicianId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -91,11 +91,11 @@ const maintenanceRequestSchema = new mongoose.Schema(
       default: null,
     },
 
-    technicianName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    // technicianName: {
+    //   type: String,
+    //   trim: true,
+    //   default: "",
+    // },
 
     scheduledDate: {
       type: Date,
@@ -113,17 +113,17 @@ const maintenanceRequestSchema = new mongoose.Schema(
       default: "MEDIUM",
     },
 
-    companyName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    // companyName: {
+    //   type: String,
+    //   required: true,
+    //   trim: true,
+    // },
 
-    departmentName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    // departmentName: {
+    //   type: String,
+    //   required: true,
+    //   trim: true,
+    // },
 
     preventive: {
       pattern: {
