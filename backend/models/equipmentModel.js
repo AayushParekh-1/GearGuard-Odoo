@@ -8,24 +8,31 @@ const equipmentSchema = new mongoose.Schema(
       trim: true,
     },
 
-    category: {
+    serialNumber: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+
+    categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "EquipmentCategory",
       required: true,
     },
 
-    categoryName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    // categoryName: {
+    //   type: String,
+    //   trim: true,
+    //   default: "",
+    // },
 
-    companyName: {
-      type: String,
-      required: true,
-      default: "My Company",
-      trim: true,
-    },
+    // companyName: {
+    //   type: String,
+    //   required: true,
+    //   default: "My Company",
+    //   trim: true,
+    // },
 
     departmentId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -33,11 +40,11 @@ const equipmentSchema = new mongoose.Schema(
       required: true,
     },
 
-    departmentName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    // departmentName: {
+    //   type: String,
+    //   trim: true,
+    //   default: "",
+    // },
 
     employeeId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -45,18 +52,12 @@ const equipmentSchema = new mongoose.Schema(
       default: null,
     },
 
-    employeeName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    // employeeName: {
+    //   type: String,
+    //   trim: true,
+    //   default: "",
+    // },
 
-    serialNumber: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
 
     assignedDate: {
       type: Date,
@@ -85,11 +86,11 @@ const equipmentSchema = new mongoose.Schema(
       required: true,
     },
 
-    workCenterName: {
-      type: String,
-      trim: true,
-      default: ""
-    },
+    // workCenterName: {
+    //   type: String,
+    //   trim: true,
+    //   default: ""
+    // },
 
     maintenanceTeamId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -97,11 +98,11 @@ const equipmentSchema = new mongoose.Schema(
       required: true,
     },
 
-    maintenanceTeamName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    // maintenanceTeamName: {
+    //   type: String,
+    //   trim: true,
+    //   default: "",
+    // },
 
     technicianId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -109,11 +110,11 @@ const equipmentSchema = new mongoose.Schema(
       default: null,
     },
 
-    technicianName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
+    // technicianName: {
+    //   type: String,
+    //   trim: true,
+    //   default: "",
+    // },
   },
   {
     timestamps: true,

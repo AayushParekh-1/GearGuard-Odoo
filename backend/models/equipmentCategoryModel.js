@@ -19,24 +19,11 @@ const equipmentCategorySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Team",
       default: null,
-    },
-
-    teamName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
-
-    // equipmentIds: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Equipment",
-    //   },
-    // ],
+    }
   },
   {
     timestamps: true,
   }
 );
 
-export default mongoose.model("EquipmentCategory", category);
+export default mongoose.model("EquipmentCategory", equipmentCategorySchema);
