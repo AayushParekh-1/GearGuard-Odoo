@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev":"nodemon main.js"
+    "dev": "nodemon main.js"
   },
   "keywords": [],
   "author": "",
@@ -12,6 +12,7 @@
   "type": "module",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.22.1",
