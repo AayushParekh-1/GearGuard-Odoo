@@ -37,7 +37,11 @@ const userSchema = new mongoose.Schema(
       default : "https://w7.pngwing.com/pngs/205/731/png-transparent-default-avatar.png",
       required: false
     },
-
+    status: {
+      type: String,
+      enum: ["Pending", "Active", "Disabled"],
+      default: "Pending",
+    },
     teamId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Team",

@@ -22,6 +22,13 @@ export const protect = async (req, res, next) => {
   } catch (error) {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
+
+  if (User.status !== "ACTIVE") {
+  return res.status(403).json({
+    message: "Account not activated by admin",
+  });
+}
+
 };
 
 //Authorise
