@@ -16,13 +16,17 @@ export const register = async (req, res) => {
       return res.status(409).json({ message: "User already exists" });
     }
 
+    // Force default role to EMPLOYEE if not admin (placeholder security)
+    // In a real app, only Admins should be able to create other roles, or it's a closed invitation system.
+    const assignedRole = "EMPLOYEE"; // Override user input for safety
+
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      role,
+      role: assignedRole,
     });
 
     res.status(201).json({

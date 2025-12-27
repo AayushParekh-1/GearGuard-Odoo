@@ -64,7 +64,7 @@ const equipmentSchema = new mongoose.Schema(
       default: null,
     },
 
-    isScarpped: {
+    isScrapped: {
       type: Boolean,
       default: false
     },

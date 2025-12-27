@@ -17,18 +17,17 @@ export const protect = async (req, res, next) => {
       return res.status(401).json({ message: "User not found" });
     }
 
+    if (user.status !== "ACTIVE") {
+      return res.status(403).json({
+        message: "Account not activated by admin",
+      });
+    }
+
     req.user = user;
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
-
-  if (User.status !== "ACTIVE") {
-  return res.status(403).json({
-    message: "Account not activated by admin",
-  });
-}
-
 };
 
 //Authorise

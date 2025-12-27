@@ -3,17 +3,18 @@ import {
   createTeam,
   addMemberToTeam,
   getAllTeams,
-} from "../controllers/teamController.js";
+} from "../controllers/team_controller.js";
+import { protect } from "../middleware/auth_middleware.js";
 
 const router = express.Router();
 
 // Create new team
-router.post("/", createTeam);
+router.post("/", protect, createTeam);
 
 // Add member to team
-router.post("/add-member", addMemberToTeam);
+router.post("/add-member", protect, addMemberToTeam);
 
 // get all teams
-router.get("/", getAllTeams);
+router.get("/", protect, getAllTeams);
 
 export default router;

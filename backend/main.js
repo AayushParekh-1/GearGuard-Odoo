@@ -6,6 +6,7 @@ import { connectDB } from "./config/db.js";
 import equipmentRoutes from "./routes/equipmentRoute.js"
 import authRoutes from "./routes/authRoute.js";
 import adminRoutes from "./routes/adminRoute.js"
+import maintainanceRequestRoute from "./routes/maintainanceRequestRoute.js";
 dotenv.config();
 
 const app = express();
@@ -25,6 +26,7 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use('/api/equipment', equipmentRoutes);
+app.use("/api/requests", maintainanceRequestRoute);
 
 
 const PORT = process.env.PORT || 5002;

@@ -3,17 +3,18 @@ import {
   createWorkCenter,
   getAllWorkCenters,
   getWorkCenterById,
-} from "../controllers/workCenterController.js";
+} from "../controllers/workcenter_controller.js";
+import { protect } from "../middleware/auth_middleware.js";
 
 const router = express.Router();
 
 // Create work center
-router.post("/", createWorkCenter);
+router.post("/", protect, createWorkCenter);
 
 // Get all work centers
-router.get("/", getAllWorkCenters);
+router.get("/", protect, getAllWorkCenters);
 
 // Get work center by ID
-router.get("/:id", getWorkCenterById);
+router.get("/:id", protect, getWorkCenterById);
 
 export default router;

@@ -32,21 +32,21 @@ const userSchema = new mongoose.Schema(
       required: false
     },
 
-    avatar : {
-      type : String,
-      default : "https://w7.pngwing.com/pngs/205/731/png-transparent-default-avatar.png",
+    avatar: {
+      type: String,
+      default: "https://w7.pngwing.com/pngs/205/731/png-transparent-default-avatar.png",
       required: false
     },
     status: {
       type: String,
-      enum: ["Pending", "Active", "Disabled"],
-      default: "Pending",
+      enum: ["PENDING", "ACTIVE", "DISABLED"],
+      default: "PENDING",
     },
     teamId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Team",
       default: null,
-      required : false,
+      required: false,
     },
   },
   {

@@ -4,14 +4,15 @@ import {
     getAllDepartments,
     getDepartmentById,
 }
-from "../controllers/department_controller.js";
+    from "../controllers/department_controller.js";
+import { protect } from "../middleware/auth_middleware.js";
 
 const router = express.Router();
 
-router.post("/", createDepartment);
+router.post("/", protect, createDepartment);
 
-router.get("/", getDepartmentById);
+router.get("/", getAllDepartments);
 
-router.get("/:id", getAllDepartments);
+router.get("/:id", getDepartmentById);
 
 export default router;

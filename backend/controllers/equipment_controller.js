@@ -17,9 +17,9 @@ export const getAllEquipment = async (req, res) => {
     const equipment = await Equipment.find()
       .populate("categoryId", "name")
       .populate("departmentId", "name")
-      .populate("assignedEmployeeId", "name")
+      .populate("employeeId", "name")
       .populate("maintenanceTeamId", "name")
-      .populate("defaultTechnicianId", "name");
+      .populate("technicianId", "name");
 
     res.json(equipment);
   } catch (err) {
@@ -33,9 +33,9 @@ export const getEquipmentById = async (req, res) => {
     const equipment = await Equipment.findById(req.params.id)
       .populate("categoryId", "name")
       .populate("departmentId", "name")
-      .populate("assignedEmployeeId", "name")
+      .populate("employeeId", "name")
       .populate("maintenanceTeamId", "name")
-      .populate("defaultTechnicianId", "name");
+      .populate("technicianId", "name");
 
     if (!equipment)
       return res.status(404).json({ message: "Equipment not found" });
