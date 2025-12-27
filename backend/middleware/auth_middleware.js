@@ -3,31 +3,37 @@ import User from "../models/userModel.js";
 
 //Protect
 export const protect = async (req, res, next) => {
-  const token = req.cookies?.token;
+  if (!token) {
+    // DEV BYPASS: Creating a mock admin user to strictly allow frontend development without Login page
+    req.user = {
+      _id: "675c7b3989c9d83863489123", // Mock ID
+      name: "Dev Admin",
+      role: "ADMIN",
+      status: "ACTIVE"
+    };
+    return next();
+    // return res.status(401).json({ message: "Not authenticated" });
+  }
 
-  // if (!token) {
-  //   return res.status(401).json({ message: "Not authenticated" });
-  // }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-  // try {
-  //   const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
 
-  //   const user = await User.findById(decoded.id).select("-password");
-  //   if (!user) {
-  //     return res.status(401).json({ message: "User not found" });
-  //   }
+    if (user.status !== "ACTIVE") {
+      return res.status(403).json({
+        message: "Account not activated by admin",
+      });
+    }
 
-  //   if (user.status !== "ACTIVE") {
-  //     return res.status(403).json({
-  //       message: "Account not activated by admin",
-  //     });
-  //   }
-
-  //   req.user = user;
+    req.user = user;
     next();
-  // } catch (error) {
-  //   return res.status(401).json({ message: "Invalid or expired token" });
-  // }
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
 };
 
 //Authorise

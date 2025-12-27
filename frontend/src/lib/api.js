@@ -1,10 +1,10 @@
 // API utility for making requests to the backend
-const API_BASE_URL = 'http://localhost:5001/api'
+const API_BASE_URL = 'http://localhost:5002/api'
 
 // Helper function to make API requests with credentials
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`
-  
+
   const defaultOptions = {
     credentials: 'include', // Include cookies for authentication
     headers: {
@@ -24,7 +24,7 @@ async function apiRequest(endpoint, options = {}) {
 
   try {
     const response = await fetch(url, config)
-    
+
     // Handle non-JSON responses
     const contentType = response.headers.get('content-type')
     if (!contentType || !contentType.includes('application/json')) {

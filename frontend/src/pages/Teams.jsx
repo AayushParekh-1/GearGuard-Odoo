@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react'
 import { getTeams, getTeamMembers } from '@/lib/getData'
 import { teamAPI } from '@/lib/api'
@@ -22,7 +23,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { ChevronDown, ChevronUp, Users, Plus } from 'lucide-react'
 import Navbar from '@/components/Navbar'
-import { cn } from '@/lib/utils'
 import { isAdminOrManager } from '@/lib/authUtils'
 
 const Teams = () => {
@@ -80,7 +80,7 @@ const Teams = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Teams Management</h1>
@@ -139,8 +139,8 @@ const Teams = () => {
                       >
                         Cancel
                       </Button>
-                      <Button 
-                        type="submit" 
+                      <Button
+                        type="submit"
                         className="bg-purple-600 hover:bg-purple-700"
                         disabled={loading}
                       >
@@ -152,7 +152,7 @@ const Teams = () => {
               </Dialog>
             )}
           </div>
-          
+
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -174,10 +174,10 @@ const Teams = () => {
                   teams.map((team) => {
                     const isExpanded = expandedTeams.has(team._id)
                     // Handle both API response (members array with user objects) and mock data (member IDs)
-                    const members = team.members 
+                    const members = team.members
                       ? (team.members[0]?.name ? team.members.map(m => m.name) : getTeamMembers(team._id))
                       : getTeamMembers(team._id)
-                    
+
                     return (
                       <React.Fragment key={team._id}>
                         <TableRow className="hover:bg-purple-50/50">
@@ -205,7 +205,7 @@ const Teams = () => {
                             {members.length > 0 ? (
                               <span className="text-sm">
                                 {members.slice(0, 2).join(', ')}
-                                {members.length > 2 && ` +${members.length - 2} more`}
+                                {members.length > 2 && ` + ${members.length - 2} more`}
                               </span>
                             ) : (
                               '-'

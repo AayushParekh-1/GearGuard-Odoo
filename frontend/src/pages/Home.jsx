@@ -21,7 +21,7 @@ import Navbar from '@/components/Navbar'
 
 const Home = () => {
   const tickets = getTickets()
-  
+
   localStorage.setItem('user', JSON.stringify({
     name: "Alice Admin",
     email: "alice@company.com",
@@ -88,15 +88,15 @@ const Home = () => {
   }, [tickets, maintenanceForFilter, maintenanceTypeFilter, equipmentFilter, workCenterFilter])
 
   // Status badge variant mapping
-  const getStatusVariant = (status) => {
-    const statusMap = {
-      'NEW': 'default',
-      'IN_PROGRESS': 'secondary',
-      'REPAIRED': 'outline',
-      'SCRAPPED': 'destructive'
-    }
-    return statusMap[status] || 'default'
-  }
+  // const getStatusVariant = (status) => {
+  //   const statusMap = {
+  //     'NEW': 'default',
+  //     'IN_PROGRESS': 'secondary',
+  //     'REPAIRED': 'outline',
+  //     'SCRAPPED': 'destructive'
+  //   }
+  //   return statusMap[status] || 'default'
+  // }
 
   // Status color mapping for light purple theme
   const getStatusColor = (status) => {
@@ -112,7 +112,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Maintenance Dashboard</h1>
@@ -206,7 +206,7 @@ const Home = () => {
               Maintenance Tickets ({filteredTickets.length})
             </h2>
           </div>
-          
+
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -242,7 +242,7 @@ const Home = () => {
                         {ticket.categoryName || '-'}
                       </TableCell>
                       <TableCell>
-                        <Badge 
+                        <Badge
                           className={`${getStatusColor(ticket.status)} border`}
                         >
                           {ticket.status}

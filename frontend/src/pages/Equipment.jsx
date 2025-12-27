@@ -3,15 +3,11 @@ import {
   equipmentAPI,
   equipmentCategoryAPI,
   teamAPI,
-  departmentAPI,
-  workCenterAPI,
 } from '@/lib/api'
 import {
   getEquipments,
   getEquipmentCategories,
   getTeams,
-  getDepartments,
-  getWorkCenters,
 } from '@/lib/getData'
 import {
   Table,
@@ -50,12 +46,10 @@ const Equipment = () => {
   const [equipments, setEquipments] = useState([])
   const [equipmentCategories, setEquipmentCategories] = useState([])
   const [teams, setTeams] = useState([])
-  const [departments, setDepartments] = useState([])
-  const [workCenters, setWorkCenters] = useState([])
 
   const [searchQuery, setSearchQuery] = useState('')
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false)
-  const [isEquipmentDialogOpen, setIsEquipmentDialogOpen] = useState(false)
+  // const [isEquipmentDialogOpen, setIsEquipmentDialogOpen] = useState(false)
 
   const [categoryFormData, setCategoryFormData] = useState({
     name: '',
@@ -63,15 +57,15 @@ const Equipment = () => {
     teamId: 'none',
   })
 
-  const [equipmentFormData, setEquipmentFormData] = useState({
-    name: '',
-    serialNumber: '',
-    categoryId: '',
-    departmentId: '',
-    location: '',
-    workCenterId: '',
-    maintenanceTeamId: '',
-  })
+  // const [equipmentFormData, setEquipmentFormData] = useState({
+  //   name: '',
+  //   serialNumber: '',
+  //   categoryId: '',
+  //   departmentId: '',
+  //   location: '',
+  //   workCenterId: '',
+  //   maintenanceTeamId: '',
+  // })
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -83,15 +77,11 @@ const Equipment = () => {
       equipmentAPI.getAll().catch(() => getEquipments()),
       equipmentCategoryAPI.getAll().catch(() => getEquipmentCategories()),
       teamAPI.getAll().catch(() => getTeams()),
-      departmentAPI.getAll().catch(() => getDepartments()),
-      workCenterAPI.getAll().catch(() => getWorkCenters()),
     ]).then(
-      ([e, c, t, d, w]) => {
+      ([e, c, t]) => {
         setEquipments(e)
         setEquipmentCategories(c)
         setTeams(t)
-        setDepartments(d)
-        setWorkCenters(w)
       }
     )
   }, [])
@@ -129,21 +119,21 @@ const Equipment = () => {
 
   /* ---------------- SUBMIT EQUIPMENT ---------------- */
 
-  const handleEquipmentSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-
-    try {
-      await equipmentAPI.create(equipmentFormData)
-      setIsEquipmentDialogOpen(false)
-      setEquipments(await equipmentAPI.getAll())
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
+  //   const handleEquipmentSubmit = async (e) => {
+  //     e.preventDefault()
+  //     setLoading(true)
+  //     setError(null)
+  //
+  //     try {
+  //       await equipmentAPI.create(equipmentFormData)
+  //       setIsEquipmentDialogOpen(false)
+  //       setEquipments(await equipmentAPI.getAll())
+  //     } catch (err) {
+  //       setError(err.message)
+  //     } finally {
+  //       setLoading(false)
+  //     }
+  //   }
 
   /* ---------------- FILTER ---------------- */
 
