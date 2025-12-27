@@ -8,7 +8,6 @@ function App() {
       <main>   
         {/* <ContextProvider> */}
           <BrowserRouter>
-            {/* <Navbar/> */}
             <Routes>
               {/* for reference */}
               {/* <Route path="/" element={<Home/>} /> */}
