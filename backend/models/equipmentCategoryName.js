@@ -27,12 +27,12 @@ const equipmentCategorySchema = new mongoose.Schema(
       default: "",
     },
 
-    equipmentIds: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Equipment",
-      },
-    ],
+    // equipmentIds: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Equipment",
+    //   },
+    // ],
   },
   {
     timestamps: true,

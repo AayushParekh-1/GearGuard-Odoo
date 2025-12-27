@@ -20,6 +20,12 @@ const workCenterSchema = new mongoose.Schema(
       ref: "Department",
     },
 
+    departmentName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
     location: {
       type: String,
       required: true,

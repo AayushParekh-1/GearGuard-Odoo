@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const maintenanceRequestSchema = new mongoose.Schema(
   {
+    subject: {
+      type: String,
+      trim: true,
+      required: true
+    },
+
     createdBy: {
       type: String,
       required: true,
@@ -18,6 +24,12 @@ const maintenanceRequestSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Equipment",
       default: null,
+    },
+
+    equipmentName: {
+      type: String,
+      trim: true,
+      default: "",
     },
 
     equipmentSerialNo: {

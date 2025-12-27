@@ -29,13 +29,13 @@ const userSchema = new mongoose.Schema(
 
     department: {
       type: String,
-      required: true,
-      default: "",
+      required: false
     },
 
     avatar : {
       type : String,
-      default : "",
+      default : "https://w7.pngwing.com/pngs/205/731/png-transparent-default-avatar.png",
+      required: false
     },
 
     teamId: {

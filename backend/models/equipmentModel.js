@@ -14,6 +14,12 @@ const equipmentSchema = new mongoose.Schema(
       required: true,
     },
 
+    categoryName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
     companyName: {
       type: String,
       required: true,
@@ -25,6 +31,12 @@ const equipmentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Department",
       required: true,
+    },
+
+    departmentName: {
+      type: String,
+      trim: true,
+      default: "",
     },
 
     employeeId: {
@@ -51,6 +63,11 @@ const equipmentSchema = new mongoose.Schema(
       default: null,
     },
 
+    isScarpped: {
+      type: Boolean,
+      default: false
+    },
+
     scrappedDate: {
       type: Date,
       default: null,
@@ -66,6 +83,12 @@ const equipmentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "WorkCenter",
       required: true,
+    },
+
+    workCenterName: {
+      type: String,
+      trim: true,
+      default: ""
     },
 
     maintenanceTeamId: {
